@@ -23,11 +23,9 @@ app.use("/", authRoutes);
 app.use("/api", geocodeRouter);
 app.use("/api", favoritesRoutes)
 
+export default app;
 
 
-app.listen(port, () => {
-  console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
-});
 
 
 
