@@ -1,27 +1,27 @@
 
 import express from "express";
-import cors from 'cors';
-import express from 'express';
+import cors from "cors";
+import getRoutes from "./routes/get.js";
+// import postRoutes from "./routes/post.js";
+import authRoutes from "./routes/auth.js";
+import geocodeRouter from "./routes/geocode.js";
+import favoritesRoutes from "./routes/favorites.js";
 
+const port = 3002;
 const app = express();
-
-// ✅ Configuration CORS plus complète
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001', 
-    'https://surf-build-back-konh2b1mh-delormes-projects-0785702a.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-
-// ✅ Ajoutez ceci AVANT vos routes
-app.options('*', cors()); // Gérer les requêtes preflight
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: "*", // ou "*" pour tout autoriser
+}));
+
+// Routes GET
+app.use("/", getRoutes);
+// app.use("/", postRoutes);
+app.use("/", authRoutes);
+app.use("/api", geocodeRouter);
+app.use("/api", favoritesRoutes)
 
 export default app;
 
