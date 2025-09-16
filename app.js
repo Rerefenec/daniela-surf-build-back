@@ -13,7 +13,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: "*", // ou "*" pour tout autoriser
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
 }));
 
 // Routes GET
