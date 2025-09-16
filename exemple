@@ -1,0 +1,34 @@
+
+
+
+
+-- Utilisateurs (inscription, login, profil, mot de passe oublié, validate password)
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  utilisateur VARCHAR(50) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  prenom VARCHAR(50),
+  nom VARCHAR(50),
+  location VARCHAR(100),
+  surf_level VARCHAR(20),
+  is_verified BOOLEAN DEFAULT FALSE,
+  password_reset_token VARCHAR(255),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+
+
+
+-- Commentaires (confirmation, accueil, profil)
+CREATE TABLE comments (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  spot_id INTEGER REFERENCES surf_spots(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+

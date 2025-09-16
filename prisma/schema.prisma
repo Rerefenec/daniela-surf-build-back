@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    Int      @id @default(autoincrement())
+  email                 String   @unique
+  prenom                String?
+  nom                   String?
+  location              String?
+  surf_level            String?
+  username              String   @unique
+  password              String
+  role                  String   @default("USER")
+  is_verified           Boolean  @default(false)
+  password_reset_token  String?
+  created_at            DateTime @default(now())
+  favorites             FavoriteSpot[]
+}
+
+model FavoriteSpot {
+  id                    Int      @id @default(autoincrement())
+  api_place_id          String   @unique // Este es el ID único de tu API
+  name                  String
+  latitude              Float
+  longitude             Float
+  favorited_by_users    User[]
+}
