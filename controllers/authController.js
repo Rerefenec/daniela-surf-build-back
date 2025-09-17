@@ -4,7 +4,12 @@ import { PrismaClient } from "@prisma/client";
 
 
 const prisma = new PrismaClient();
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "patron";
+const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET;
+if (!ACCESS_TOKEN_SECRET) {
+  console.error("❌ JWT_SECRET n'est pas défini !");
+}
+
+
 const REFRESH_SECRET = process.env.REFRESH_SECRET || "refreshtoken_secret";
 
 // Génère un token JWT

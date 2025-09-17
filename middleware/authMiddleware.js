@@ -2,6 +2,9 @@ import jwt from 'jsonwebtoken';
 
 console.log('Authentification de la requête...'); // Debug
 // Authentifie l'utilisateur via JWT
+const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET;
+if (!ACCESS_TOKEN_SECRET) console.error("❌ JWT_SECRET n'est pas défini !");
+
 export const authenticateToken = (req, res, next) => {
   console.log('Headers reçus:', req.headers); // Debug supplémentaire
   
@@ -16,7 +19,7 @@ export const authenticateToken = (req, res, next) => {
 
   try {
     // 🔧 CORRECTION : Utiliser ACCESS_TOKEN_SECRET comme dans le login
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     console.log('Token décodé avec succès:', decoded); // Debug
 
@@ -56,7 +59,7 @@ export const optionalAuth = (req, res, next) => {
 
   try {
     // 🔧 CORRECTION : Utiliser ACCESS_TOKEN_SECRET ici aussi
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = {
       id: decoded.id,
       email: decoded.email,
