@@ -1,10 +1,10 @@
 import express from 'express';
-import { getProfile } from "../controllers/authController.js";
+import { getProfile, updateProfile } from "../controllers/authController.js";
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import {
   signup,
   changePassword,
-  changeProfile,
+  updateProfile,
   login,
   logout,
   refreshToken,
@@ -19,5 +19,5 @@ router.post('/login', login);
 router.post('/refresh-token', refreshToken); 
 router.post('/logout', logout); 
 router.get('/profile',authenticateToken , getProfile)
-router.post("/change-profile", authenticateToken, changeProfile);
+router.post("/change-profile", authenticateToken, updateProfile);
 export default router;

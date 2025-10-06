@@ -307,69 +307,73 @@ export const getProfile = async (req, res) => {
   }
 };
 
-export const changeProfile = async (req, res) => {
-  const userId = req.user.id; // récupéré via le token JWT middleware
-  const { prenom, nom, adresse, surf, utilisateur, email, password } = req.body;
-
-  if (!prenom || !nom || !adresse || !surf || !utilisateur || !email)
-    return res.status(400).json({ error: "Champs requis manquants." });
-
+export const updateProfile = async (req, res) => {
   try {
+    const token = req.headers["authorization"]?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "Token missing" });
+
+    // Décodage JWT pour récupérer l'ID utilisateur
+    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    const userId = decoded.id;
+
+    // Récupération des champs envoyés depuis le front
+    const { prenom, nom, adresse, surf, utilisateur, email, password } = req.body;
+
+    if (!prenom || !nom || !adresse || !surf || !utilisateur || !email) {
+      return res.status(400).json({ error: "Champs requis manquants." });
+    }
+
     // Vérifie si l'email est déjà utilisé par un autre utilisateur
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing && existing.id !== userId)
+    if (existing && existing.id !== userId) {
       return res.status(409).json({ error: "Email déjà utilisé." });
+    }
 
     // Prépare les données à mettre à jour
     const updateData = {
       prenom,
       nom,
+      email,
+      username: utilisateur,
       location: adresse,
       surf_level: surf,
-      username: utilisateur,
-      email,
     };
 
     if (password) {
       updateData.password = await bcrypt.hash(password, 10);
     }
 
-    const user = await prisma.user.update({
-      where: { id: userId },
-      data: updateData,
-    });
-
-    res.status(200).json({ message: "Modifications réussies !" });
-  } catch (error) {
-    console.error("Profile update error:", error);
-    res.status(500).json({ error: "Erreur serveur." });
-  }
-};
-
-// ======================== UPDATE PROFILE ========================
-
-export const updateProfile = async (req, res) => {
-  try {
-    const token = req.headers["authorization"]?.split(" ")[1];
-    if (!token) return res.status(401).json({ error: "Token missing" });
-
-    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
-    const userId = decoded.id;
-
-    const { username, location, surf_level } = req.body;
-    if (!username || !location || !surf_level) {
-      return res.status(400).json({ error: "Missing fields" });
-    }
-
+    // Mise à jour en base
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { username, location, surf_level },
-      select: { id: true, username: true, location: true, surf_level: true, email: true },
+      data: updateData,
+      select: {
+        id: true,
+        prenom: true,
+        nom: true,
+        email: true,
+        username: true,
+        location: true,
+        surf_level: true,
+        role: true,
+      },
     });
 
-    res.json(updatedUser);
+    res.json({
+      message: "Profil mis à jour avec succès",
+      user: {
+        id: updatedUser.id,
+        prenom: updatedUser.prenom,
+        nom: updatedUser.nom,
+        email: updatedUser.email,
+        utilisateur: updatedUser.username,
+        adresse: updatedUser.location,
+        surf: updatedUser.surf_level,
+        role: updatedUser.role,
+      },
+    });
   } catch (error) {
     console.error("Update profile error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Erreur serveur." });
   }
 };
