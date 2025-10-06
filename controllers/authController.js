@@ -345,3 +345,31 @@ export const changeProfile = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur." });
   }
 };
+
+// ======================== UPDATE PROFILE ========================
+
+export const updateProfile = async (req, res) => {
+  try {
+    const token = req.headers["authorization"]?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "Token missing" });
+
+    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    const userId = decoded.id;
+
+    const { username, location, surf_level } = req.body;
+    if (!username || !location || !surf_level) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { username, location, surf_level },
+      select: { id: true, username: true, location: true, surf_level: true, email: true },
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
